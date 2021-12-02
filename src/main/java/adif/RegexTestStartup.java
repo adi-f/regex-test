@@ -1,7 +1,9 @@
 package adif;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -24,8 +26,7 @@ class RegexTestStartup {
   enum Result {
     MATCH("matches", Color.GREEN.darker()),
     NO_MATCH("no match", Color.ORANGE),
-    INVALID_REGEX("invalid regex", Color.RED),
-    ;
+    INVALID_REGEX("invalid regex", Color.RED);
 
     private final String text;
     private final Color color;
@@ -45,25 +46,35 @@ class RegexTestStartup {
   }
 
   public static void main(String[] args) {
+    Font monospaced = new Font(Font.MONOSPACED, Font.PLAIN, 12);
     JFrame window = new JFrame();
     GridBagLayout layout = new GridBagLayout();
+    window.setTitle("RegEx Tester");
     window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     window.setLayout(layout);
-
     window.setSize(500, 150);
 
-    JTextField regexInput = new JTextField(50);
+    JTextField regexInput = new JTextField();
+    regexInput.setFont(monospaced);
     regexInput.setText("");
+
     JCheckBox stringEscapeInput = new JCheckBox();
-    stringEscapeInput.setSelected(false);
-    JTextField sampleInput = new JTextField(50);
+    JCheckBox matchAllInput = new JCheckBox();
+
+    JTextField sampleInput = new JTextField();
+    sampleInput.setFont(monospaced);
     sampleInput.setText("");
+
     JLabel resultOutput = new JLabel();
 
     window.add(new JLabel("RegEx:"), constraint(0, 0));
     window.add(regexInput, constraint(1, 0, 3));
 
-    window.add(flow(stringEscapeInput, new JLabel("escape string")), constraint(1, 1));
+    window.add(flow(
+        stringEscapeInput, new JLabel("escape string"),
+        gap(30),
+        matchAllInput, new JLabel("match all")
+      ), constraint(1, 1));
 
     window.add(new JLabel("Sample:"), constraint(0, 2));
     window.add(sampleInput, constraint(1, 2, 3));
@@ -71,9 +82,10 @@ class RegexTestStartup {
     window.add(new JLabel("Result:"), constraint(0, 3));
     window.add(resultOutput, constraint(1, 3, 3));
 
-    Listener onInput = evaluateAndShowResult(regexInput, stringEscapeInput, sampleInput, resultOutput);
+    Listener onInput = evaluateAndShowResult(regexInput, stringEscapeInput, matchAllInput, sampleInput, resultOutput);
     regexInput.getDocument().addDocumentListener(onInput);
     stringEscapeInput.addActionListener(onInput);
+    matchAllInput.addActionListener(onInput);
     sampleInput.getDocument().addDocumentListener(onInput);
 
     window.setVisible(true);
@@ -82,27 +94,33 @@ class RegexTestStartup {
   private static Listener evaluateAndShowResult(
       JTextField regexInput,
       JCheckBox stringEscapeInput,
+      JCheckBox matchAllInput,
       JTextField sampleInput,
       JLabel resultOutput) {
 
     return new Listener(() -> {
       String regex = regexInput.getText();
       boolean escapeString = stringEscapeInput.isSelected();
+      boolean matchAll = matchAllInput.isSelected();
       String sample = sampleInput.getText();
 
-      Result result = evaluate(regex, escapeString, sample);
+      Result result = evaluate(regex, escapeString, matchAll, sample);
 
       resultOutput.setText(result.getText());
       resultOutput.setForeground(result.getColor());
     });
   }
 
-  private static Result evaluate(String regex, boolean escapeString, String sample) {
+  private static Result evaluate(String regex, boolean escapeString, boolean matchAll, String sample) {
     if(escapeString) {
       regex = StringEscapeUtils.unescapeJava(regex);
     }
     try {
-      return Pattern.compile(regex).matcher(sample).find() ? Result.MATCH : Result.NO_MATCH;
+      if(matchAll) {
+        return Pattern.compile(regex).matcher(sample).matches() ? Result.MATCH : Result.NO_MATCH;
+      } else {
+        return Pattern.compile(regex).matcher(sample).find() ? Result.MATCH : Result.NO_MATCH;
+      }
     } catch (PatternSyntaxException e) {
       return Result.INVALID_REGEX;
     }
@@ -128,6 +146,13 @@ class RegexTestStartup {
     for (JComponent component : components) {
       panel.add(component);
     }
+    return panel;
+  }
+
+  private static JComponent gap(int width) {
+    JPanel panel = new JPanel();
+    panel.setLayout(null);
+    panel.setPreferredSize(new Dimension(width, 1));
     return panel;
   }
 
