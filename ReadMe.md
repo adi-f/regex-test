@@ -7,3 +7,6 @@ Key Points:
 * Maven project builds an executable JAR
 * Kept simple & stupid: One single Java source file
 * One external dependency (Apache commons-text)
+
+## NEW: regex-test.html
+Does the same as the Java application does but uses JavaScript (different Regex implementations have different features/behavior).

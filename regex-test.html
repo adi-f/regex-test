@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Regex Tester</title>
+        <style>
+            body {
+                font-family: sans-serif;
+            }
+            label {
+                display: inline-block;
+                width: 5em;
+            }
+
+            input {
+                width: 30em;
+            }
+
+            div {
+                margin: 1em 0.1em;
+            }
+
+            span {
+                padding: 0.2em;
+                color: white;
+                font-weight: bold;
+                border-radius: 0.3em;
+            }
+
+            span.match {
+                background: green;
+            }
+
+            span.no-match {
+                background: indianred;
+            }
+
+            span.error {
+                background: blueviolet;
+            }
+
+        </style>
+    </head>
+    <body>
+        <h1>Regex Tester</h1>
+        <div><label for="regex">Regex:</label><input id="regex"></div>
+        <div><label for="value">Value:</label><input id="value"></div>
+        <div><label></label><button id="evaluate">Evaluate</button></div>
+        <div><label></label><span id="result"></span></div>
+
+        <script>
+            (() => {
+                const regexInput = document.getElementById('regex');
+                const valueInput = document.getElementById('value');
+                const evaluateBtn = document.getElementById('evaluate');
+                const resultSpan = document.getElementById('result');
+
+                evaluateBtn.addEventListener('click', () => {
+                    const regex = regexInput.value;
+                    const value = valueInput.value;
+
+                    let resultValue;
+                    let resultClass;
+                    try {
+                        if(RegExp(regex).test(value)) {
+                            resultValue = 'match';
+                            resultClass = 'match';
+                        } else {
+                            resultValue = 'no match';
+                            resultClass = 'no-match';
+                        }
+                    } catch (e) {
+                        resultValue = String(e);
+                        resultClass = 'error';
+                    }
+
+                    resultSpan.innerText = resultValue;
+                    resultSpan.className = resultClass;
+                });
+            })();
+        </script>
+    </body>
+</html>
