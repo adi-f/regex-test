@@ -10,3 +10,5 @@ Key Points:
 
 ## NEW: regex-test.html
 Does the same as the Java application does but uses JavaScript (different Regex implementations have different features/behavior).
+
+Hint: You can directly use it this way: [regex-test.html](https://raw.githack.com/adi-f/regex-test/master/regex-test.html)
